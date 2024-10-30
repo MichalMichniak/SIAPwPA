@@ -9,8 +9,8 @@ source install/setup.bash
 ros2 launch simple_example example.launch.py
 
 
+W NOWYM TERMINALU: 
 
-# w nowym terminalu 
 ros2 run CameraDataAcquisition cameraDataAcquisition 
 # W rvision: 
 Add / By topic i tam dodajemy topici które chcemy podejrzeć
