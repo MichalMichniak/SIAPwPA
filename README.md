@@ -1,15 +1,18 @@
 # SIAPwPA - DRL 
 
 # pierwsze budowanie:
+
 colcon build 
+
 source install/setup.bash
+
 ros2 launch simple_example example.launch.py
 
 
 
-w nowym terminalu 
+# w nowym terminalu 
 ros2 run CameraDataAcquisition cameraDataAcquisition 
-W rvision: 
+# W rvision: 
 Add / By topic i tam dodajemy topici które chcemy podejrzeć
 
 ## How to run Gazebo Simulation
