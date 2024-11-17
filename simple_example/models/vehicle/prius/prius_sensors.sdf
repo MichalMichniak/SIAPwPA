@@ -450,10 +450,10 @@
         <robot_base_frame>robot/base_footprint</robot_base_frame>
   
         <!-- Topic configurations -->
-        <odom_publish_frequency>10</odom_publish_frequency>
+        <odom_publish_frequency>1</odom_publish_frequency>
         <odom_topic>/robot/odometry</odom_topic>
         <odom_covariance_topic>/robot/odometry_with_covariance</odom_covariance_topic>
-        <tf_topic>/tf</tf_topic>
+        <tf_topic>/robot/pose</tf_topic>
   
         <!-- Dimensionality -->
         <dimensions>3</dimensions>
@@ -464,6 +464,46 @@
   
         <!-- Noise -->
         <gaussian_noise>0</gaussian_noise>
-      </plugin>
+          </plugin>
+          <!-- Moving Left-->
+    <plugin filename="gz-sim-triggered-publisher-system"
+    name="gz::sim::systems::TriggeredPublisher">
+<input type="gz.msgs.Int32" topic="/keyboard/keypress">
+    <match field="data">16777234</match>
+</input>
+<output type="gz.msgs.Twist" topic="/cmd_vel">
+    linear: {x: 0.0}, angular: {z: 0.5}
+</output>
+</plugin>
+<!-- Moving Forward-->
+<plugin filename="gz-sim-triggered-publisher-system"
+    name="gz::sim::systems::TriggeredPublisher">
+<input type="gz.msgs.Int32" topic="/keyboard/keypress">
+    <match field="data">16777235</match>
+</input>
+<output type="gz.msgs.Twist" topic="/cmd_vel">
+    linear: {x: 0.5}, angular: {z: 0.0}
+</output>
+</plugin>
+<!-- Moving Right-->
+<plugin filename="gz-sim-triggered-publisher-system"
+    name="gz::sim::systems::TriggeredPublisher">
+<input type="gz.msgs.Int32" topic="/keyboard/keypress">
+    <match field="data">16777236</match>
+</input>
+<output type="gz.msgs.Twist" topic="/cmd_vel">
+    linear: {x: 0.0}, angular: {z: -0.5}
+</output>
+</plugin>
+<!-- Moving Backward-->
+<plugin filename="gz-sim-triggered-publisher-system"
+    name="gz::sim::systems::TriggeredPublisher">
+<input type="gz.msgs.Int32" topic="/keyboard/keypress">
+    <match field="data">16777237</match>
+</input>
+<output type="gz.msgs.Twist" topic="/cmd_vel">
+    linear: {x: -0.5}, angular: {z: 0.0}
+</output>
+</plugin>
   </model>
 </sdf>
