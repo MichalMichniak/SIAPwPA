@@ -36,7 +36,8 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=['/world/sonoma/model/prius_hybrid_sensors/link/sensors/sensor/front_camera_sensor/image@sensor_msgs/msg/Image@gz.msgs.Image',
-                   '/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
+                   '/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo', 
+                   '/robot/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry'],
         output='screen'
     )
 
