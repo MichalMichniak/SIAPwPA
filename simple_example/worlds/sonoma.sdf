@@ -233,7 +233,7 @@
     </include> -->
     <include>
       <pose>278.08 -134.22 2.86 0.02 0 0.97</pose>
-      <uri>/home/developer/ros2_ws/src/simple_example/models/vehicle/prius/prius_sensors.sdf</uri>
+      <uri>/home/developer/ros2_ws/src/simple_example/models/vehicle/prius_sensors.sdf</uri>
       <!-- <uri>model://prius_sensors</uri> -->
     </include>
   </world>
