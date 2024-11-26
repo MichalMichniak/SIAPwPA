@@ -528,18 +528,18 @@
     </joint>
 
       <!-- Wtyczka Differential Drive -->
+      <plugin
+      filename="gz-sim-diff-drive-system"
+      name="gz::sim::systems::DiffDrive">
+      <left_joint>front_left_wheel</left_joint>
+      <right_joint>front_right_wheel</right_joint>
+      <wheel_separation>2.82</wheel_separation>
+      <wheel_radius>0.31265</wheel_radius>
+      <odom_publish_frequency>100</odom_publish_frequency>
+      <topic>/cmd_vel</topic>
+  </plugin>
 
-    <plugin
-    filename="gz-sim-diff-drive-system"
-    name="gz::sim::systems::DiffDrive">
-    <left_joint>front_left_wheel</left_joint>
-    <right_joint>front_right_wheel</right_joint>
-    <wheel_separation>2.82</wheel_separation>
-    <wheel_radius>0.31265</wheel_radius>
-    <odom_publish_frequency>1</odom_publish_frequency>
-    <topic>cmd_vel</topic>
-</plugin>
-    
+  
     <plugin filename="gz-sim-triggered-publisher-system"
     name="gz::sim::systems::TriggeredPublisher">
 <input type="gz.msgs.Int32" topic="/keyboard/keypress">

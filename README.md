@@ -12,6 +12,7 @@ ros2 launch simple_example example.launch.py
 W NOWYM TERMINALU: 
 
 ros2 run CameraDataAcquisition cameraDataAcquisition 
+gz topic -e  -t /keyboard/keypress
 # W rvision: 
 Add / By topic i tam dodajemy topici które chcemy podejrzeć
 

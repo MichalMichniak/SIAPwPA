@@ -13,6 +13,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
         (os.path.join('share', package_name, 'models/vehicle'), glob(os.path.join('models/vehicle', '*'))),
+        (os.path.join('share', package_name, 'models/vehicle'), glob(os.path.join('models/vehicle', 'prius/model.sdf'))),
         (os.path.join('share', package_name, 'worlds'), glob(os.path.join('worlds', '*'))),
 
     ],
