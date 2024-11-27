@@ -37,7 +37,8 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=['/world/sonoma/model/prius_hybrid_sensors/link/sensors/sensor/front_camera_sensor/image@sensor_msgs/msg/Image@gz.msgs.Image',
                    '/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo', 
-                   '/robot/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry'],
+                   '/robot/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry',
+                   '/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist'],
         output='screen'
     )
 
