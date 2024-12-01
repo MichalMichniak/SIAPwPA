@@ -20,7 +20,7 @@ setup(
     data_files=[('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
-        (os.path.join('share', package_name, 'worlds'), glob(os.path.join('worlds', '*')))] 
+        (os.path.join('share', package_name, 'worlds'), glob(os.path.join('worlds', '*')))] ,
                 # + generate_data_files('share/'+package_name+'/', 'models'),
     # data_files=[
         # ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
@@ -41,7 +41,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'ros_gazebo_ex = simple_example.simple_example_node:main'
+            'ros_gazebo_ex = simple_example.simple_example_node:main',
+            'keyboard_control = simple_example.keyboard_control:main'
         ],
     },
 )
