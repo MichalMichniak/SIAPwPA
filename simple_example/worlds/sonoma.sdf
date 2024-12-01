@@ -784,5 +784,9 @@
         <gaussian_noise>0</gaussian_noise>
           </plugin>
     </model>
+    <include>
+      <pose>278.08 -134.22 2.86 0.02 0 0.97</pose>
+      <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/Prius Hybrid with sensors</uri>
+    </include>
   </world>
 </sdf>
