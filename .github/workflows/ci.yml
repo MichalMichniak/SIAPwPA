@@ -25,11 +25,12 @@ jobs:
       run: |
         docker build --pull --rm -f .devcontainer/Dockerfile -t ros2-humble:ci .
 
-    - name: Install and run Flake8
+    - name: Install flake8 and run checks
       run: |
         docker run --rm -v $(pwd):/home/developer/ros2_ws ros2-humble:ci /bin/bash -c "
         source /opt/ros/humble/setup.bash &&
         cd /home/developer/ros2_ws &&
+        pip install flake8 && 
         flake8 ."
 
     - name: Run Docker container and build workspace
