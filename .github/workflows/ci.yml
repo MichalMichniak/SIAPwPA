@@ -21,9 +21,9 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Build Docker image
+    - name: Build Docker image from .devcontainer/Dockerfile
       run: |
-        docker build --pull --rm -f Dockerfile -t ros2-humble:ci .
+        docker build --pull --rm -f .devcontainer/Dockerfile -t ros2-humble:ci .
 
     - name: Run Docker container and build workspace
       run: |
