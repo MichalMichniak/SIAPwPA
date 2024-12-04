@@ -1,0 +1,63 @@
+name: ROS2 Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build Project
+    runs-on: ubuntu-latest
+    container:
+      image: althack/ros2:humble-full
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install \
+            ros-humble-can-msgs \
+            ros-humble-nmea-msgs \
+            ros-humble-geographic-msgs \
+            ros-humble-diagnostic-updater \
+            ros-humble-robot-localization \
+            ros-humble-pcl-ros
+
+      - name: Configure Git for Access
+        env:
+          CI_WORKER_CI_TOKEN: ${{ secrets.CI_WORKER_CI_TOKEN }}
+        run: git config --global url."https://oauth2:${CI_WORKER_CI_TOKEN}@github.com/".insteadOf "https://github.com/"
+
+      - name: Build the Project
+        run: colcon build
+
+      - name: Upload Build Artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            build/
+            log/
+            install/
+
+  test:
+    name: Test Project
+    runs-on: ubuntu-latest
+    container:
+      image: althack/ros2:humble-full
+    needs: build
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+
+      - name: Run Tests
+        run: |
+          source install/setup.bash
+          colcon test --return-code-on-test-failure
