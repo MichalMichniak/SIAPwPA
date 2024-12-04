@@ -30,4 +30,5 @@ jobs:
         docker run --rm -v $(pwd):/home/developer/ros2_ws ros2-humble:ci /bin/bash -c "
         source /opt/ros/humble/setup.bash &&
         cd /home/developer/ros2_ws &&
+        colcon build --symlink-install &&  # Build the workspace first
         colcon test --return-code-on-test-failure"
