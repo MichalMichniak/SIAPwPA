@@ -16,17 +16,18 @@ class GetDistances:
         self.mapped_data_out = self.create_grids(self.zew)
 
 # ADD DATA TO PROPER GRIDS
-    def create_grids(self, df):
+     def create_grids(self, df):
         mapped_data = [[[] for _ in range(self.grid_size)] for _ in range(self.grid_size)]
         for _, row in df.iterrows():
-            grid_idxs = self.find_grid_nums(int(row['x']), int(row['y']))
+            grid_idxs = self.find_grid_nums(row['x'], row['y'])
+            print(grid_idxs)
             mapped_data[grid_idxs[0]][grid_idxs[1]].append((row['x'], row['y']))
         return mapped_data
 
     def find_grid_nums(self, x_pos, y_pos):
         x_grid_num = (x_pos - self.x_sizes[0]) // self.x_step
         y_grid_num = (y_pos - self.y_sizes[0]) // self.y_step
-        return int(x_grid_num), int(y_grid_num)
+        return min(int(x_grid_num), self.grid_size-1), min(int(y_grid_num), self.grid_size-1)
     
     def get_rewards(self, x, y):
         return self.get_distance(x, y, self.mapped_data_in), self.get_distance(x, y, self.mapped_data_out)
