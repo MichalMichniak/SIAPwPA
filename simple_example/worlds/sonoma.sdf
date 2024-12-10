@@ -768,7 +768,7 @@
         <robot_base_frame>robot/base_footprint</robot_base_frame>
   
         <!-- Topic configurations -->
-        <odom_publish_frequency>1</odom_publish_frequency>
+        <odom_publish_frequency>5</odom_publish_frequency>
         <odom_topic>/robot/odometry</odom_topic>
         <!-- <odom_covariance_topic>/robot/odometry_with_covariance</odom_covariance_topic> -->
         <tf_topic>/robot/pose</tf_topic>
