@@ -384,7 +384,7 @@
                 <pose frame=''>0 0.4 2.0 0 0 -1.5707</pose>
             </sensor>
             <sensor name='front_camera_sensor' type='camera'>
-                <update_rate>30</update_rate>
+                <update_rate>3</update_rate>
                 <camera name='front_camera'>
                 <horizontal_fov>1.39626</horizontal_fov>
                 <image>
@@ -1074,7 +1074,10 @@
           </dynamics>
         </axis>
       </joint>
-
+      <joint name="sensor_joint" type="fixed">
+        <parent>chassis</parent>
+        <child>sensors</child>
+      </joint>
         <plugin
           filename="ignition-gazebo-ackermann-steering-system"
           name="ignition::gazebo::systems::AckermannSteering">
@@ -1104,7 +1107,7 @@
         <robot_base_frame>robot/base_footprint</robot_base_frame>
   
         <!-- Topic configurations -->
-        <odom_publish_frequency>1</odom_publish_frequency>
+        <odom_publish_frequency>10</odom_publish_frequency>
         <odom_topic>/robot/odometry</odom_topic>
         <!-- <odom_covariance_topic>/robot/odometry_with_covariance</odom_covariance_topic> -->
         <tf_topic>/robot/pose</tf_topic>
@@ -1113,7 +1116,7 @@
         <dimensions>3</dimensions>
   
         <!-- Offsets -->
-        <xyz_offset>0 0 0</xyz_offset>
+        <xyz_offset>0 -1.0 0</xyz_offset>
         <rpy_offset>0 0 0</rpy_offset>
   
         <!-- Noise -->

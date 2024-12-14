@@ -17,6 +17,9 @@ import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
 import time
+import pandas as pd
+from scripts.reward_function import GetDistances
+from scripts.script_to_read_pos import OdometryListener
 
 class CameraDataAcquisition(Node):
     
@@ -32,9 +35,9 @@ class CameraDataAcquisition(Node):
         self.cv_image = np.zeros((800, 800, 4))
 
     def listener_callback(self, msg):
-        self.get_logger().info('Image width: "%s"' % msg.width)
-        self.get_logger().info('Image height: "%s"' % msg.height)
-        self.get_logger().info('Image encoding: "%s"' % msg.encoding)
+        # self.get_logger().info('Image width: "%s"' % msg.width)
+        # self.get_logger().info('Image height: "%s"' % msg.height)
+        # self.get_logger().info('Image encoding: "%s"' % msg.encoding)
         self.cv_image = self.cvBridge.imgmsg_to_cv2(msg, 'bgra8') # image for further processing
 
 
@@ -44,7 +47,7 @@ class MinimalPublisher(Node):
         super().__init__('minimal_publisher')
         self.publisher_ = self.create_publisher(Twist, '/cmd_vel', 10)
         self.timer = self.create_timer(1.0, self.publish_message)  # Publikuj co 1 sekundę
-        self.get_logger().info('Publishing /cmd_vel message')
+        # self.get_logger().info('Publishing /cmd_vel message')
         self.linear_x = 0
         self.angular_z = 0
 
@@ -59,7 +62,7 @@ class MinimalPublisher(Node):
         msg.angular.z = self.angular_z
 
         self.publisher_.publish(msg)
-        self.get_logger().info(f'Published: {msg}')
+        # self.get_logger().info(f'Published: {msg}')
 
 
 class SodomaAndGomora(gym.Env):
@@ -67,6 +70,10 @@ class SodomaAndGomora(gym.Env):
 
     def __init__(self):
       super(SodomaAndGomora, self).__init__()
+      self.wew = pd.read_csv("/home/developer/ros2_ws/src/simple_example/simple_example/scripts/wewnetrzne_git.csv")
+      self.zew = pd.read_csv("/home/developer/ros2_ws/src/simple_example/simple_example/scripts/zewnetrzne_git.csv")
+      self.find_len = GetDistances(self.wew, self.zew, 100)
+      self.node = OdometryListener()
       self.cameraDataAcquisition = CameraDataAcquisition()
       self.minimal_publisher = MinimalPublisher()
       # Define action and observation space
@@ -83,20 +90,21 @@ class SodomaAndGomora(gym.Env):
         0: (1.0,0.0),
         1: (1.0,-0.5),
         2: (1.0,0.5),
-        3: (-0.5,0.0)
+        3: (2.0,0.0)
         }
 
     def step(self, action):
         #TODO: sterowanie
         self.minimal_publisher.linear_x, self.minimal_publisher.angular_z = self.actions[action]
         
-        #TODO: tutaj plougin na step symulation
+        #TODO: tutaj plugin na step symulation
         subprocess.run(["gz", "service", "-s", "/world/sonoma/control", "--reqtype", 
                     "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", 
                     "--timeout", "3000", "--req", "pause: false"])
         rclpy.spin_once(self.minimal_publisher)
-        time.sleep(1)
+        time.sleep(0.25)
         rclpy.spin_once(self.cameraDataAcquisition)
+        rclpy.spin_once(self.node)
         subprocess.run(["gz", "service", "-s", "/world/sonoma/control", "--reqtype", 
                         "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", 
                         "--timeout", "3000", "--req", "pause: true"])
@@ -104,13 +112,15 @@ class SodomaAndGomora(gym.Env):
         #   rclpy.spin_once(self.cameraDataAcquisition)
         #   os.system("gz service -s /world/sonoma/control --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 3000 --req 'pause: true'")
         observation = self.cameraDataAcquisition.cv_image
-        reward = 0.01 #TODO
+        x,y = self.node.coords
+        d_right, d_left  = self.find_len.get_rewards(x,y)
+        d_center = (d_right + d_left)/2 - min(d_left, d_right)
+        minimize = d_center + (d_right + d_left)**2 -144
+        reward = np.exp((minimize**2)/10) #TODO
+        print(reward)
         done = False #TODO parametr oznaczający kiedy restart
-        self.curr_steps+=1
-        if(self.curr_steps > self.max_steps):
+        if ((d_right < 0.35) or (d_left < 0.35)):
             done = True
-            self.curr_steps=0
-        
         info = {}
         return observation, reward, done, info
     
@@ -130,7 +140,7 @@ def main(args=None):
     rclpy.init(args=args)
     env = SodomaAndGomora()
     model = PPO(CnnPolicy, env, verbose=3, batch_size=64)
-    model.learn(total_timesteps=2, reset_num_timesteps=False)
+    model.learn(total_timesteps=10000, reset_num_timesteps=False)
     model.save(f"model{1}")
     env.close()
     rclpy.shutdown()
