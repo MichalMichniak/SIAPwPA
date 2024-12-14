@@ -116,7 +116,7 @@ class SodomaAndGomora(gym.Env):
         d_right, d_left  = self.find_len.get_rewards(x,y)
         d_center = (d_right + d_left)/2 - min(d_left, d_right)
         minimize = d_center + (d_right + d_left)**2 -144
-        reward = np.exp((minimize**2)/10) #TODO
+        reward = np.exp(-(minimize**2)/10) #TODO
         print(reward)
         done = False #TODO parametr oznaczający kiedy restart
         if ((d_right < 0.35) or (d_left < 0.35)):
