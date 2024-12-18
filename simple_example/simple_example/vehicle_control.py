@@ -40,13 +40,13 @@ class MinimalPublisher(Node):
         self.publisher_ = self.create_publisher(Twist, '/cmd_vel', 10)
         self.timer = self.create_timer(1.0, self.publish_message)  # Publikuj co 1 sekundę
         # self.get_logger().info('Publishing /cmd_vel message')
-        self.linear_x = 0
-        self.angular_z = 0
+        self.linear_x = 0.0
+        self.angular_z = 0.0
 
 
     def publish_message(self):
         msg = Twist()
-        msg.linear.x = self.linear_x
+        msg.linear.x = float(self.linear_x)
         msg.linear.y = 0.0
         msg.linear.z = 0.0
         msg.angular.x = 0.0
@@ -99,9 +99,7 @@ class Control:
                 # Get action from model
                 action, _ = self.model.predict(observation, deterministic=True)
 
-                print(self.actions[action])
-
-                self.minimal_publisher.linear_x, self.minimal_publisher.angular_z = self.actions[action]
+                self.minimal_publisher.linear_x, self.minimal_publisher.angular_z = self.actions[int(action)]
 
         except KeyboardInterrupt:
             print("Control loop interrupted.")
@@ -109,7 +107,7 @@ class Control:
 
 def main(args=None):
     rclpy.init(args=args)
-    model_path = "model1.zip"
+    model_path = "model1"
     controller = Control(model_path)
     controller.control_loop()
     rclpy.shutdown()
