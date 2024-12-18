@@ -112,15 +112,21 @@ class SodomaAndGomora(gym.Env):
         #   rclpy.spin_once(self.cameraDataAcquisition)
         #   os.system("gz service -s /world/sonoma/control --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 3000 --req 'pause: true'")
         observation = self.cameraDataAcquisition.cv_image
-        x,y = self.node.coords
-        d_right, d_left  = self.find_len.get_rewards(x,y)
-        d_center = (d_right + d_left)/2 - min(d_left, d_right)
-        minimize = d_center + (d_right + d_left)**2 -144
-        reward = np.exp(-(minimize**2)/10) #TODO
-        print(reward)
-        done = False #TODO parametr oznaczający kiedy restart
-        if ((d_right < 0.35) or (d_left < 0.35)):
-            done = True
+        # x,y = self.node.coords
+        # d_right, d_left  = self.find_len.get_rewards(x,y)
+        # d_center = (d_right + d_left)/2 - min(d_left, d_right)
+        # minimize = d_center + (d_right + d_left)**2 -144
+        # reward = np.exp(-(minimize**2)/10) #TODO
+        # print(reward)
+        # done = False #TODO parametr oznaczający kiedy restart
+        # if ((d_right < 0.35) or (d_left < 0.35)):
+        #     done = True
+
+        left, right = self.find_len.get_rewards(self.node.coords[0],self.node.coords[1])
+        minimize = ((left+right)/2) - min(left,right) + (left+right)**2 - 143
+        reward = np.exp(-minimize**2/7) #TODO
+        done = minimize>9.5
+        
         info = {}
         return observation, reward, done, info
     
