@@ -33,7 +33,7 @@ class GetDistances:
         return self.get_distance(x, y, self.mapped_data_in), self.get_distance(x, y, self.mapped_data_out)
 
     def get_distance(self, x, y, grid):
-        distance = np.inf
+        distance = 1000
         grid_i, grid_j = self.find_grid_nums(x, y)
 
         i_min = max(0, grid_i - 1)

@@ -35,9 +35,9 @@ class CameraDataAcquisition(Node):
         self.cv_image = np.zeros((800, 800, 4))
 
     def listener_callback(self, msg):
-        # self.get_logger().info('Image width: "%s"' % msg.width)
-        # self.get_logger().info('Image height: "%s"' % msg.height)
-        # self.get_logger().info('Image encoding: "%s"' % msg.encoding)
+        self.get_logger().info('Image width: "%s"' % msg.width)
+        self.get_logger().info('Image height: "%s"' % msg.height)
+        self.get_logger().info('Image encoding: "%s"' % msg.encoding)
         self.cv_image = self.cvBridge.imgmsg_to_cv2(msg, 'bgra8') # image for further processing
 
 
@@ -145,9 +145,10 @@ class SodomaAndGomora(gym.Env):
 def main(args=None):
     rclpy.init(args=args)
     env = SodomaAndGomora()
-    model = PPO(CnnPolicy, env, verbose=3, batch_size=64)
-    model.learn(total_timesteps=10000, reset_num_timesteps=False)
-    model.save(f"model{1}")
+    model = PPO(CnnPolicy, env, verbose=3, batch_size=32)
+    for i in range(1000):
+        model.learn(total_timesteps=10, reset_num_timesteps=False)
+        model.save(f"model{1}")
     env.close()
     rclpy.shutdown()
 
