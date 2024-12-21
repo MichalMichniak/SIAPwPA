@@ -384,12 +384,13 @@
                 <pose frame=''>0 0.4 2.0 0 0 -1.5707</pose>
             </sensor>
             <sensor name='front_camera_sensor' type='camera'>
-                <update_rate>3</update_rate>
+                <pose frame=''>0 -0.4 1.4 0 0.05 -1.5707</pose>
+                <update_rate>20</update_rate>
                 <camera name='front_camera'>
                 <horizontal_fov>1.39626</horizontal_fov>
                 <image>
-                    <width>800</width>
-                    <height>800</height>
+                    <width>224</width>
+                    <height>224</height>
                     <format>R8G8B8</format>
                 </image>
                 <clip>
@@ -401,8 +402,8 @@
                     <mean>0</mean>
                     <stddev>0.007</stddev>
                 </noise>
+                
                 </camera>
-                <pose frame=''>0 -0.4 1.4 0 0.05 -1.5707</pose>
             </sensor>
             <sensor name='front_left_far_sonar_sensor' type='ray'>
                 <ray>
@@ -1107,7 +1108,7 @@
         <robot_base_frame>robot/base_footprint</robot_base_frame>
   
         <!-- Topic configurations -->
-        <odom_publish_frequency>10</odom_publish_frequency>
+        <odom_publish_frequency>20</odom_publish_frequency>
         <odom_topic>/robot/odometry</odom_topic>
         <!-- <odom_covariance_topic>/robot/odometry_with_covariance</odom_covariance_topic> -->
         <tf_topic>/robot/pose</tf_topic>

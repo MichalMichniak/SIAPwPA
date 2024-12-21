@@ -20,16 +20,16 @@ def generate_launch_description():
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={'gz_args': '-r /home/developer/ros2_ws/src/simple_example/worlds/sonoma.sdf'}.items(),
+        launch_arguments={'gz_args': ' -r /home/developer/ros2_ws/src/simple_example/worlds/sonoma.sdf'}.items(), 
     )
 
     # RViz
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        arguments=['-d', os.path.join(pkg_ros_gz_sim_demos, 'rviz', 'camera.rviz')],
-        condition=IfCondition(LaunchConfiguration('rviz'))
-    )
+    # rviz = Node(
+    #     package='rviz2',
+    #     executable='rviz2',
+    #     arguments=['-d', os.path.join(pkg_ros_gz_sim_demos, 'rviz', 'camera.rviz')],
+    #     condition=IfCondition(LaunchConfiguration('rviz'))
+    # )
 
     # Bridge
     bridge = Node(
@@ -43,9 +43,9 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument('rviz', default_value='true',
-                              description='Open RViz.'),
+        # DeclareLaunchArgument('rviz', default_value='true',
+        #                       description='Open RViz.'),
         gz_sim,
         bridge,
-        rviz
+        # rviz
     ])
