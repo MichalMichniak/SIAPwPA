@@ -33,7 +33,10 @@ RUN apt update && \
         flake8-quotes \
         pytest-repeat \
         pytest-rerunfailures \
-        pytest
+        pytest \
+        gym \
+        stable-baselines3 \
+        shimmy
 
 RUN pip3 install \
     kconfiglib \
