@@ -26,13 +26,14 @@ class CameraDataAcquisition(Node):
             20)
         self.subscription
         self.cvBridge = CvBridge()
-        self.cv_image = np.zeros((800, 800, 4))
+        self.cv_image = np.zeros((3 ,224, 224))
 
     def listener_callback(self, msg):
         # self.get_logger().info('Image width: "%s"' % msg.width)
         # self.get_logger().info('Image height: "%s"' % msg.height)
         # self.get_logger().info('Image encoding: "%s"' % msg.encoding)
-        self.cv_image = self.cvBridge.imgmsg_to_cv2(msg, 'bgra8') # image for further processing
+        self.cv_image = self.cvBridge.imgmsg_to_cv2(msg, 'bgr8').T
+        # self.cv_image = self.cvBridge.imgmsg_to_cv2(msg, 'bgra8') # image for further processing
 
 class MinimalPublisher(Node):
     def __init__(self):
@@ -75,22 +76,23 @@ class Control:
         try:
             while rclpy.ok():
 
-                subprocess.run(["gz", "service", "-s", "/world/sonoma/control", "--reqtype", 
-                    "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", 
-                    "--timeout", "3000", "--req", "pause: false"])
+                # subprocess.run(["gz", "service", "-s", "/world/sonoma/control", "--reqtype", 
+                #     "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", 
+                #     "--timeout", "3000", "--req", "pause: false"])
                 
                 rclpy.spin_once(self.minimal_publisher)
                 time.sleep(0.25)
                 rclpy.spin_once(self.cameraDataAcquisition)
                 
-                subprocess.run(["gz", "service", "-s", "/world/sonoma/control", "--reqtype", 
-                                "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", 
-                                "--timeout", "3000", "--req", "pause: true"])
+                # subprocess.run(["gz", "service", "-s", "/world/sonoma/control", "--reqtype", 
+                #                 "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", 
+                #                 "--timeout", "3000", "--req", "pause: true"])
                 # Get camera image
                 observation = self.cameraDataAcquisition.cv_image
 
                 # Ensure observation is in the correct format
-                if observation.shape == (800, 800, 4):
+                print(observation.shape)
+                if observation.shape == (3 ,224, 224):
                     observation = observation.astype(np.uint8)
                 else:
                     print("Invalid observation shape, skipping action.")

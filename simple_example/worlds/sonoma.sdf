@@ -109,7 +109,8 @@
     </include>
 
     <model name="prius_hybrid_sensors">
-        <pose>278.08 -134.22 2.86 0.02 0 0.97</pose>
+        <!-- <pose>278.08 -134.22 2.86 0.02 0 0.97</pose> -->
+        <pose>245.08 30.0 4.86 0.02 0 3.97</pose>
         <link name="chassis">
             <inertial>
                 <mass>1326.0</mass>

@@ -108,7 +108,7 @@ class SodomaAndGomora(gym.Env):
       self.executor.add_node(self.cameraDataAcquisition)
       self.executor.add_node(self.node)
       self.exe_thread = threading.Thread(target = self.executor.spin, daemon=True)
-      
+      self.prev_coords = (0,0)
       self.exe_thread.start()
       # Define action and observation space
       # They must be gym.spaces objects
@@ -157,11 +157,16 @@ class SodomaAndGomora(gym.Env):
         #     done = True
         with self.position_lck:
             coords = self.node.coords
-        left, right = self.find_len.get_rewards(coords[0],coords[1])
-        minimize = ((left+right)/2) - min(left,right) + (left+right)**2 - 143
-        reward = np.exp(-minimize**2/7) #TODO
-        done = minimize>9.5
-        
+        print(coords)
+        left, right, dist= self.find_len.get_rewards(coords[0],coords[1])
+        minimize = ((left+right)/2) - min(left,right)
+        reward = np.exp(-minimize**2/7)-0.5 #TODO
+        print(left,right, dist)
+        done = left+0.7>dist or right+0.7>dist #(minimize>120 or np.sqrt((self.prev_coords[0]-coords[0])**2+(self.prev_coords[1]-coords[1])**2)<0.5)
+        if done:
+            reward -= 1
+        self.prev_coords = self.node.coords
+        # print(minimize,minimize>10.5)
         info = {}
         return observation, reward, done, info
     
@@ -180,9 +185,10 @@ class SodomaAndGomora(gym.Env):
 def main(args=None):
     rclpy.init(args=args)
     env = SodomaAndGomora()
-    model = PPO(CnnPolicy, env, verbose=3, batch_size=32)
+    # model = PPO(CnnPolicy, env, verbose=3, batch_size=32)
+    model = PPO.load(f"model{1}",env=env)
     for i in range(1000):
-        model.learn(total_timesteps=10, reset_num_timesteps=False)
+        model.learn(total_timesteps=100, reset_num_timesteps=False)
         model.save(f"model{1}")
     env.close()
     rclpy.shutdown()
