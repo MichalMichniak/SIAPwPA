@@ -1,12 +1,9 @@
 import gym
 from gym import spaces
 import os
-
 import rclpy
 from rclpy.node import Node
-
 from sensor_msgs.msg import Image
-
 import numpy as np
 import cv2 as cv
 from cv_bridge import CvBridge
@@ -41,22 +38,16 @@ class CameraDataAcquisition(Node):
 
     def listener_callback(self, msg):
         self.get_logger().info('Image width: "%s"' % msg.width)
-        # self.get_logger().info('Image height: "%s"' % msg.height)
-        # self.get_logger().info('Image encoding: "%s"' % msg.encoding)
         if self.lock:
             self.state.wait()
             with self.lock:
                 self.cv_image = self.cvBridge.imgmsg_to_cv2(msg, 'bgr8').T # image for further processing
-
-
-
 
 class MinimalPublisher(Node):
     def __init__(self, lock, state):
         super().__init__('minimal_publisher')
         self.publisher_ = self.create_publisher(Twist, '/cmd_vel', 10)
         self.timer = self.create_timer(0.1, self.publish_message)  # Publikuj co 1 sekundę
-        # self.get_logger().info('Publishing /cmd_vel message')
         self.linear_x = 0.0
         self.angular_z = 0.0
         self.lock = lock
@@ -93,6 +84,8 @@ class SodomaAndGomora(gym.Env):
       super(SodomaAndGomora, self).__init__()
       self.wew = pd.read_csv("/home/developer/ros2_ws/src/simple_example/simple_example/scripts/wewnetrzne_git.csv")
       self.zew = pd.read_csv("/home/developer/ros2_ws/src/simple_example/simple_example/scripts/zewnetrzne_git.csv")
+      
+      # inicialization of read mutexes
       self.camera_lck = threading.Lock()
       self.position_lck = threading.Lock()
       self.action_lck = threading.Lock()
@@ -110,14 +103,7 @@ class SodomaAndGomora(gym.Env):
       self.exe_thread = threading.Thread(target = self.executor.spin, daemon=True)
       self.prev_coords = (0,0)
       self.exe_thread.start()
-      # Define action and observation space
-      # They must be gym.spaces objects
-      # Example when using discrete actions:
       self.action_space = spaces.Discrete(4)
-      # parametr do done
-      self.max_steps = 128
-      self.curr_steps = 0
-      # Example for using image as input (channel-first; channel-last also works):
       self.observation_space = spaces.Box(low=0, high=255,
                         shape=(3 ,224, 224), dtype=np.uint8)
       self.actions = {
@@ -128,10 +114,8 @@ class SodomaAndGomora(gym.Env):
         }
 
     def step(self, action):
-        #TODO: sterowanie
         self.minimal_publisher.linear_x, self.minimal_publisher.angular_z = self.actions[action]
-        
-        #TODO: tutaj plugin na step symulation
+        # symulation:
         self.state.set()
         subprocess.run(["gz", "service", "-s", "/world/sonoma/control", "--reqtype", 
                     "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", 
@@ -141,52 +125,43 @@ class SodomaAndGomora(gym.Env):
         subprocess.run(["gz", "service", "-s", "/world/sonoma/control", "--reqtype", 
                         "gz.msgs.WorldControl", "--reptype", "gz.msgs.Boolean", 
                         "--timeout", "3000", "--req", "pause: true"])
-        #   os.system("gz service -s /world/sonoma/control --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 3000 --req 'pause: false'")
-        #   rclpy.spin_once(self.cameraDataAcquisition)
-        #   os.system("gz service -s /world/sonoma/control --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 3000 --req 'pause: true'")
+        # get obserwations:
         with self.camera_lck:
             observation = self.cameraDataAcquisition.cv_image
-        # x,y = self.node.coords
-        # d_right, d_left  = self.find_len.get_rewards(x,y)
-        # d_center = (d_right + d_left)/2 - min(d_left, d_right)
-        # minimize = d_center + (d_right + d_left)**2 -144
-        # reward = np.exp(-(minimize**2)/10) #TODO
-        # print(reward)
-        # done = False #TODO parametr oznaczający kiedy restart
-        # if ((d_right < 0.35) or (d_left < 0.35)):
-        #     done = True
         with self.position_lck:
             coords = self.node.coords
-        print(coords)
+
+        # compute rewards:
         left, right, dist= self.find_len.get_rewards(coords[0],coords[1])
         minimize = ((left+right)/2) - min(left,right)
-        reward = np.exp(-minimize**2/7)-0.5 #TODO
-        print(left,right, dist)
-        done = left+0.7>dist or right+0.7>dist #(minimize>120 or np.sqrt((self.prev_coords[0]-coords[0])**2+(self.prev_coords[1]-coords[1])**2)<0.5)
+        reward = np.exp(-minimize**2/7)-0.5
+
+        # reset criterion:
+        done = left+0.7>dist or right+0.7>dist
         if done:
             reward -= 1
         self.prev_coords = self.node.coords
-        # print(minimize,minimize>10.5)
+
         info = {}
         return observation, reward, done, info
     
     def reset(self):
-      # TODO: to jest upośledzone
+      # reset function
       os.system("gz service -s /world/sonoma/control --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 3000 --req 'reset: {all: true}' && gz service -s /world/sonoma/control --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 3000 --req 'pause: true'")
-      self.curr_steps = 0
       os.system("gz service -s /world/sonoma/control --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 3000 --req 'pause: false'")
       os.system("gz service -s /world/sonoma/control --reqtype gz.msgs.WorldControl --reptype gz.msgs.Boolean --timeout 3000 --req 'pause: true'")
       with self.camera_lck:
         observation = self.cameraDataAcquisition.cv_image
-      return observation # reward, done, info can't be included
+      return observation
 
 
 
 def main(args=None):
     rclpy.init(args=args)
     env = SodomaAndGomora()
-    # model = PPO(CnnPolicy, env, verbose=3, batch_size=32)
-    model = PPO.load(f"model{1}",env=env)
+    # chose to make new model or train existing one
+    model = PPO(CnnPolicy, env, verbose=3, batch_size=32)
+    # model = PPO.load(f"model{1}",env=env)
     for i in range(1000):
         model.learn(total_timesteps=100, reset_num_timesteps=False)
         model.save(f"model{1}")
