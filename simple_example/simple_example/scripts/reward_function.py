@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-# wew = pd.read_csv("wewnetrzne_git.csv")
-# zew = pd.read_csv("zewnetrzne_git.csv")
 
 class GetDistances:
     def __init__(self, wew, zew, grid_size=20):
@@ -20,7 +18,6 @@ class GetDistances:
         mapped_data = [[[] for _ in range(self.grid_size)] for _ in range(self.grid_size)]
         for _, row in df.iterrows():
             grid_idxs = self.find_grid_nums(row['x'], row['y'])
-            # print(grid_idxs)
             mapped_data[grid_idxs[0]][grid_idxs[1]].append((row['x'], row['y']))
         return mapped_data
 
@@ -54,19 +51,3 @@ class GetDistances:
                         point = data
                         
         return distance, point
-    
-
-# find_len = GetDistances(wew, zew, 100)
-# print(find_len.x_sizes)
-# print(find_len.y_sizes)
-# print(find_len.x_step)
-# print(find_len.y_step)
-
-# # print(find_len.find_grid_nums(400, -200))
-# print(len(find_len.mapped_data_in[(0,0)]))
-# print(len(find_len.mapped_data_in[(0,1)]))
-# print(len(find_len.mapped_data_in[(1,0)]))
-# print(len(find_len.mapped_data_in[(1,1)]))
-
-# print(find_len.get_rewards(325,-180))
-# print(find_len.mapped_data_in)
