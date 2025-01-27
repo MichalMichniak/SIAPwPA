@@ -63,7 +63,7 @@ Gdzie \<id\> to wartość ROS_DOMAIN_ID z zakresu 0 and 231
 
 Implementacja algorytmu składa się z paru części łączących interfejs gazebo z interfejsem w pythonie za pomocą systemu ROS 2.
 
-![model_arch](https://github.com/user-attachments/assets/e6e02b4c-7ab1-4fba-9de4-79d625a0a455)
+![topic](https://github.com/user-attachments/assets/377a5dab-8587-43e7-9f62-87643e7c27b2)
 
 W procesie trenowania algorytmu została wykorzystana biblioteka Stable Baselines oraz do implementacji środowiska biblioteka gym. Jako model wybrano model dedykowany do przetwarzania obrazów - CnnPolicy.
 
